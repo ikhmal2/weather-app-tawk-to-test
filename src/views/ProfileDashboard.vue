@@ -11,7 +11,10 @@
 				<span> </span>
 			</div>
 			<div class="profile-details">
-				<img src="../assets/img/default_profile.png" alt="profile" />
+				<div class="profile-container">
+					<img class="profile-picture" src="../assets/img/default_profile.png" alt="profile" />
+					<img v-show="isEdit" class="edit-icon" src="../assets/img/edit-icon.png" alt="edit">
+				</div>
 				<div class="profile-details-inner">
 					<p class="name">John Doe</p>
 					<div class="contacts">
@@ -23,11 +26,11 @@
 		<form class="flex" action="#">
 			<div class="form-item-container">
 				<label for="name">Full Name</label>
-				<input type="text" id="name" placeholder="John Doe" />
+				<input :disabled="!isEdit" type="text" id="name" value="John Doe" />
 			</div>
 			<div class="form-item-container">
 				<label for="email">Email</label>
-				<input type="text" id="email" placeholder="jane@gmail.com" />
+				<input :disabled="!isEdit" type="text" id="email" value="jane@gmail.com" />
 			</div>
 			<div class="form-item-container">
 				<label for="phone">Phone Number</label>
@@ -36,19 +39,19 @@
 				}" :inputProps="{
 					placeholder: '+01 234 567 89',
 					class: 'full',
-				}" />
+				}" :disabled="!isEdit" />
 			</div>
 		</form>
 		<div class="btn-container">
 			<div class="inner">
-				<BaseButton class="btn">Edit</BaseButton>
+				<BaseButton class="btn" @click="isEdit = !isEdit">{{ isEdit ? 'submit' : 'edit' }}</BaseButton>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import BaseButton from '@/singleton/BaseButton.vue'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -61,6 +64,9 @@ onMounted(() => {
 		telNumberInputContainer.style.width = '100%'
 	}
 })
+
+const isEdit = ref(false)
+
 </script>
 
 <style scoped>
@@ -76,7 +82,6 @@ onMounted(() => {
 
 .header-container {
 	padding: 32px;
-	/* background-color: #f5f8ff; */
 	position: relative;
 	overflow: hidden;
 	width: 100%;
@@ -91,19 +96,31 @@ onMounted(() => {
 	left: 0;
 	width: 100%;
 	height: 18.625rem;
-	background: url(https://media.geeksforgeeks.org/wp-content/uploads/20200326181026/wave3.png);
 	background: url("../assets/img/wave.png");
 	background-position-y: 100%;
 	background-size: cover;
 	background-repeat: no-repeat;
 	z-index: -1;
-	/* Keeps the wave behind the content */
 }
 
 @media only screen and (max-width: 600px) {
 	.header-container::before {
 		background-position-y: -9rem;
 	}
+}
+
+.profile-container {
+	position: relative;
+}
+
+.profile-container .edit-icon {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 }
 
 .header {
@@ -165,13 +182,22 @@ label {
 }
 
 input {
-	background-color: #f5f5f5;
-	border: 0;
+	background-color: #FFFFFF;
+	border: 1px solid #EDEDED;
+	box-shadow: 0 2px 25px 1px #00000005;
 	padding-left: 12px;
 	padding-right: 12px;
 	height: 50px;
 	border-radius: 0.5rem;
 	width: 100%;
+	color: #212121;
+	font-weight: normal;
+	font-size: .875rem;
+}
+
+input[disabled] {
+	background-color: #f5f5f5;
+	border: 0;
 }
 
 input::placeholder {
