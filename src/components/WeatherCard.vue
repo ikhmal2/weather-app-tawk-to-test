@@ -32,7 +32,7 @@ const currentLocation = ref<coords>({
 	longitude: null,
 })
 
-const errMsg = ref('');
+const errMsg = ref('')
 const weatherData = ref({})
 
 const date = new Date()
@@ -41,8 +41,8 @@ date.setHours(0, 0, 0, 0)
 
 // async function getWeatherData(lat: number | null, long: number | null) {
 async function getWeatherData(position) {
-	const lat = position.coords.latitude;
-	const long = position.coords.longitude;
+	const lat = position.coords.latitude
+	const long = position.coords.longitude
 	const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${long}&units=metric&appid=3e4ab56c9ba5a0c2807affcd2226e2a3`
 	try {
 		if (lat !== null || long !== null) {
@@ -53,7 +53,7 @@ async function getWeatherData(position) {
 			const response = await resp.json()
 			weatherData.value = await response
 		} else {
-			throw new Error("Can't retrieve Long Lang");
+			throw new Error("Can't retrieve Long Lang")
 		}
 	} catch (error) {
 		console.log(error)
@@ -64,8 +64,7 @@ function getLocation() {
 	if (navigator.geolocation) {
 		navigator.geolocation.getCurrentPosition(getWeatherData)
 	} else {
-		if (currentLocation.value)
-			errMsg.value = 'Geolocation is not supported by this browser.'
+		if (currentLocation.value) errMsg.value = 'Geolocation is not supported by this browser.'
 	}
 }
 
@@ -75,21 +74,27 @@ const todayWeather = computed(() => {
 		hi: 0,
 		low: 0,
 		weather: '',
+	}
 
+	if (!weatherData.value?.list?.length) return weatherDetails
+
+	const today = new Date().toISOString().slice(0, 10)
+
+	const todayData = weatherData.value.list.find((item) => {
+		const itemDate = item.dt_txt
+		return itemDate.includes(today)
+	})
+
+	if (todayData) {
+		weatherDetails.temp = Math.round(todayData.main.temp)
+		weatherDetails.hi = Math.round(todayData.main.temp_max)
+		weatherDetails.low = Math.round(todayData.main.temp_min)
+		weatherDetails.weather = todayData.weather[0]?.description || ''
 	}
-	for (let i = 0; i < weatherData.value.list.length; i++) {
-		const item = weatherData.value.list[i]
-		const unixDate = new Date(item.dt * 1000)
-		unixDate.setHours(0, 0, 0, 0)
-		if (date.getDate() === unixDate.getDate()) {
-			weatherDetails.temp = Math.round(item.main.temp);
-			weatherDetails.hi = Math.round(item.main.temp_max);
-			weatherDetails.low = Math.round(item.main.temp_min);
-			weatherDetails.weather = item.weather[0].description;
-		}
-	}
-	return weatherDetails;
+
+	return weatherDetails
 })
+
 onMounted(() => {
 	getLocation()
 })
