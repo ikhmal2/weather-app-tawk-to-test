@@ -18,3 +18,19 @@ export const useProfileDetails = defineStore('profile-details', {
     },
   },
 })
+
+interface coords {
+  longitude: number
+  latitude: number
+}
+
+export const useWeather = defineStore('weather-details', {
+  state: () => ({
+    list: <coords[]>[],
+  }),
+  actions: {
+    addList(payload: coords) {
+      this.list.push(payload)
+    },
+  },
+})

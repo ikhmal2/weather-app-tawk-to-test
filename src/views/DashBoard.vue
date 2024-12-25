@@ -1,17 +1,24 @@
 <template>
   <div class="dashboard">
-    <div class="flex header">
+    <div v-show="!hideElementsStatus" class="flex header">
       <h1>Weather</h1>
       <RouterLink to="/profile"><img src="../assets/img/profile.svg" alt="Profile" /></RouterLink>
     </div>
-    <SearchBar />
-    <WeatherCard />
+    <SearchBar @hide-elements="hideElements" />
+    <WeatherCard v-show="!hideElementsStatus" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import SearchBar from '@/components/SearchBar.vue'
 import WeatherCard from '@/components/WeatherCard.vue'
+
+const hideElementsStatus = ref(false)
+
+function hideElements(status: boolean) {
+  hideElementsStatus.value = status
+}
 </script>
 
 <style scoped>
