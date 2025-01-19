@@ -12,6 +12,7 @@ export interface Openweather {
 
 export interface Current {
   dt: number
+  currentTime: number
   sunrise?: number
   sunset?: number
   temp: number
