@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { Openweather } from '@/types'
 
 export const useProfileDetails = defineStore('profile-details', {
   state: () => ({
@@ -19,18 +20,26 @@ export const useProfileDetails = defineStore('profile-details', {
   },
 })
 
-interface coords {
+interface storedLocations {
   longitude: number
   latitude: number
+  name: string
+  data: Openweather
 }
 
 export const useWeather = defineStore('weather-details', {
   state: () => ({
-    list: <coords[]>[],
+    list: <storedLocations[]>[],
   }),
+  persist: true,
   actions: {
-    addList(payload: coords) {
+    addList(payload: storedLocations) {
       this.list.push(payload)
+    },
+    removeList(longitude: number, latitude: number) {
+      this.list = this.list.filter(
+        (location) => location.longitude !== longitude || location.latitude !== latitude,
+      )
     },
   },
 })
