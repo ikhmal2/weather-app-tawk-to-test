@@ -13,12 +13,16 @@
 import { ref } from 'vue'
 import SearchBar from '@/components/SearchBar.vue'
 import WeatherCard from '@/components/WeatherCard.vue'
+import { useWeather } from '@/store'
 
 const hideElementsStatus = ref(false)
 
 function hideElements(status: boolean) {
   hideElementsStatus.value = status
 }
+
+const store = useWeather()
+const savedWeather = store.list
 </script>
 
 <style scoped>
