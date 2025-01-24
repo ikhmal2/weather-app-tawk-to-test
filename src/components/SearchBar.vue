@@ -1,37 +1,20 @@
 <template>
   <div id="search" :class="fullScreen ? 'full-screen' : ''" class="flex relative">
     <div class="relative search-container flex">
-      <input
-        v-model="searchQuery"
-        @input="getSearchResult"
-        type="text"
-        placeholder="Search for a city or airport"
-      />
+      <input v-model="searchQuery" @input="getSearchResult" type="text" placeholder="Search for a city or airport" />
       <img src="../assets/img/search.svg" alt="Search Icon" />
-      <img
-        @click="clearResult"
-        v-show="searchQuery !== ''"
-        src="../assets/img/close.svg"
-        alt="close"
-      />
+      <img @click="clearResult" v-show="searchQuery !== ''" src="../assets/img/close.svg" alt="close" />
     </div>
     <ul v-show="searchQuery !== ''" class="search-result">
       <p v-if="searchError">Something went wrong, try again later</p>
-      <li
-        v-for="(result, index) in mapboxSearchResult"
-        :key="result.id"
-        @click="
-          saveWeather(
-            result.properties.coordinates,
-            `${result.properties.name}, ${result.properties.context.country.name}`,
-          )
-        "
-      >
-        <span>{{ result.properties.name }}</span
-        >,
-        <span v-if="index !== 0"
-          >{{ result.properties.context.region.region_code }}<span>&nbsp;</span></span
-        >
+      <li v-for="(result, index) in mapboxSearchResult" :key="result.id" @click="
+        saveWeather(
+          result.properties.coordinates,
+          `${result.properties.name}, ${result.properties.context.country.name}`,
+        )
+        ">
+        <span>{{ result.properties.name }}</span>,
+        <span v-if="index !== 0">{{ result.properties.context.region.region_code }}<span>&nbsp;</span></span>
         <span>{{ result.properties.context.country.name }}</span>
       </li>
     </ul>
@@ -41,16 +24,15 @@
 <script setup lang="ts">
 import axios from 'axios'
 import { ref, watch } from 'vue'
-import { useWeather } from '@/store'
 import router from '@/router'
-const store = useWeather()
+import { Feature } from '@/types'
 
 const emit = defineEmits(['hideElements'])
 
 const fullScreen = ref(false)
 const searchQuery = ref('')
 const queryTimeout = ref(0)
-const mapboxSearchResult = ref({})
+const mapboxSearchResult = ref<Feature[]>()
 const searchError = ref(false)
 const getSearchResult = () => {
   clearTimeout(queryTimeout.value)
@@ -81,7 +63,6 @@ interface coords {
 }
 
 function saveWeather(coord: coords, name: string) {
-  store.addList(coord)
   router.push({
     name: 'weather',
     query: {
@@ -92,7 +73,7 @@ function saveWeather(coord: coords, name: string) {
   })
 }
 
-watch(searchQuery, (newVal, oldVal) => {
+watch(searchQuery, (newVal) => {
   if (newVal !== '') {
     emit('hideElements', true)
     fullScreen.value = true
@@ -137,11 +118,11 @@ li {
   padding-bottom: 0.5rem;
 }
 
-li > span:first-child {
+li>span:first-child {
   font-weight: bold;
 }
 
-li > span:not(:first-child) {
+li>span:not(:first-child) {
   color: #545454;
 }
 
