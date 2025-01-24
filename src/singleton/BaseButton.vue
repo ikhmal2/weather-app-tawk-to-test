@@ -1,18 +1,7 @@
 <template>
-  <button
-    class="BaseButton"
-    :disabled="props.disabled"
-    :data-variant="props.variant"
-    :class="additionalClasses"
-    :type="props.type"
-    :style="{ minWidth: props.minWidth }"
-  >
-    <component
-      class="inner"
-      :is="props.href ? 'a' : 'span'"
-      :target="props.target"
-      :href="props.href"
-    >
+  <button class="BaseButton" :disabled="props.disabled" :class="additionalClasses" :type="props.type"
+    :style="{ minWidth: props.minWidth }">
+    <component class="inner" :is="props.href ? 'a' : 'span'" :target="props.target" :href="props.href">
       <slot></slot>
     </component>
   </button>
