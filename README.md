@@ -1,20 +1,16 @@
-# weather-app-tawk-to-test
+# Weather App tawk.to Test
 
-This template should help get you started developing with Vue 3 in Vite.
+The project is a simple weather app that fetches weather data from an API and displays it to the user. The app uses Vue 3 + Vite + TypeScript for its frontend development. It also includes Pinia for state management.The app fetches weather data from an API and displays it to the user.
 
 ## Recommended IDE Setup
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
+[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar).
 
 ## Project Setup
+
+Replace the `VITE_MAPBOX_API_KEY` and `VITE_WEATHEROPENAPI__KEY` in `.env` file with your own API keys.
+MapBox[http://docs.mapbox.com/help/getting-started/access-tokens/]
+WeatherOpenAPI[https://openweathermap.org/api/one-call-3]
 
 ```sh
 npm install
