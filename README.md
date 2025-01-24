@@ -33,3 +33,10 @@ npm run build
 ```sh
 npm run lint
 ```
+
+### To deploy to Github Pages
+
+```sh
+npm run build
+git subtree push --prefix dist origin gh-pages
+```
