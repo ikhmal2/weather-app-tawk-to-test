@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia'
-import { Openweather } from '@/types'
 
 export const useProfileDetails = defineStore('profile-details', {
   state: () => ({
     name: 'Jane Doe',
     email: 'jane@gmail.com',
-    telNo: '+01 234 567 89',
+    telNo: '123 - 456 - 7890',
   }),
+  persist: true,
   actions: {
     updateName(payload: string) {
       this.name = payload
@@ -20,26 +20,48 @@ export const useProfileDetails = defineStore('profile-details', {
   },
 })
 
-interface storedLocations {
+export interface storedLocations {
   longitude: number
   latitude: number
   name: string
-  data: Openweather
+  current?: boolean
 }
 
 export const useWeather = defineStore('weather-details', {
   state: () => ({
     list: <storedLocations[]>[],
+    showCurrent: true,
   }),
-  persist: true,
+  persist: {
+    pick: ['list'],
+  },
   actions: {
     addList(payload: storedLocations) {
-      this.list.push(payload)
+      const isDuplicate = this.list.some(
+        (location) =>
+          location.longitude === payload.longitude && location.latitude === payload.latitude,
+      )
+
+      if (!isDuplicate) {
+        if (payload.current) {
+          this.list.forEach((location) => {
+            if (location.current) {
+              location.current = false
+            }
+          })
+          this.list.unshift(payload)
+        } else {
+          this.list.push(payload)
+        }
+      }
     },
     removeList(longitude: number, latitude: number) {
       this.list = this.list.filter(
         (location) => location.longitude !== longitude || location.latitude !== latitude,
       )
+    },
+    removeCurrentLocationCard() {
+      this.showCurrent = false
     },
   },
 })
