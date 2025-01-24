@@ -48,12 +48,12 @@ const getSearchResult = () => {
       }
       return
     }
-    mapboxSearchResult.value = {}
+    mapboxSearchResult.value = []
   }, 300)
 }
 
 function clearResult() {
-  mapboxSearchResult.value = {}
+  mapboxSearchResult.value = []
   searchQuery.value = ''
 }
 
