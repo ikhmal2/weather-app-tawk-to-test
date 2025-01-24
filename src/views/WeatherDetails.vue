@@ -21,10 +21,7 @@
         }}
       </div>
       <div class="icon">
-        <img
-          :src="`https://openweathermap.org/img/wn/${weatherData.current.weather[0].icon}@2x.png`"
-          alt=""
-        />
+        <img :src="`https://openweathermap.org/img/wn/${weatherData.current.weather[0].icon}@2x.png`" alt="" />
       </div>
       <div class="temperature">
         <div class="current-temperature">{{ Math.round(weatherData.current.temp) }} °C</div>
@@ -63,7 +60,7 @@
   <section class="forecast">
     <div class="forecast-title">Weekly Forecast</div>
     <div class="weekly-forecast">
-      <div class="weekly-item" v-for="(day, index) in weatherData?.daily" :key="day.dt">
+      <div class="weekly-item" v-for="(day) in weatherData?.daily" :key="day.dt">
         <div class="weekly-details">
           <div class="weekly-icon">
             <img :src="`https://openweathermap.org/img/wn/${day.weather[0].icon}@2x.png`" alt="" />
@@ -93,13 +90,14 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 import { Current, Openweather } from '@/types'
-import { useWeather } from '@/store'
+import { useWeather, storedLocations } from '@/store'
 const route = useRoute()
 const store = useWeather()
 
-const lat = route.query.lat
-const long = route.query.long
-const name = route.query.name
+const lat = (route.query.lat as unknown) as number
+const long = (route.query.long as unknown) as number
+const name = (route.query.name as unknown) as string
+const current = route.query.current
 
 const weatherData = ref<Openweather>()
 
@@ -124,6 +122,7 @@ async function getWeatherData() {
 }
 
 const hourlyWeather = computed(() => {
+  const windowSize = window.matchMedia("(min-width: 48rem)")
   const now = new Date()
   const fourHoursWeather: Current[] = []
 
@@ -134,23 +133,36 @@ const hourlyWeather = computed(() => {
 
     if (hourTime < now) continue
 
-    if (fourHoursWeather.length < 4) {
-      fourHoursWeather.push(hourData)
+    if (windowSize.matches) {
+      if (fourHoursWeather.length < 8) {
+        fourHoursWeather.push(hourData)
+      } else {
+        break
+      }
     } else {
-      break
+      if (fourHoursWeather.length < 4) {
+        fourHoursWeather.push(hourData)
+      } else {
+        break
+      }
     }
+
   }
 
   return fourHoursWeather
 })
 
 function saveWeather() {
-  const details = {
+  const details: storedLocations = {
     longitude: long,
     latitude: lat,
     name: name,
-    data: weatherData.value,
   }
+
+  if (current) {
+    details.current = true;
+  }
+
   store.addList(details)
   saved.value = true
 }
@@ -158,6 +170,9 @@ function saveWeather() {
 function removeWeather() {
   store.removeList(long, lat)
   saved.value = false
+  if (current) {
+    store.removeCurrentLocationCard()
+  }
 }
 
 const saved = ref(false)
