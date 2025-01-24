@@ -5,15 +5,19 @@
       <RouterLink to="/profile"><img src="../assets/img/profile.svg" alt="Profile" /></RouterLink>
     </div>
     <SearchBar @hide-elements="hideElements" />
-    <WeatherCard v-show="!hideElementsStatus" />
+    <template v-if="!hideElementsStatus">
+      <!-- <WeatherCard /> -->
+      <WeatherCard v-for="(saved, index) in store.list" :key="index" :weather="saved" />
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import SearchBar from '@/components/SearchBar.vue'
 import WeatherCard from '@/components/WeatherCard.vue'
-import { useWeather } from '@/store'
+import { storedLocations, useWeather } from '@/store'
+import axios from 'axios'
 
 const hideElementsStatus = ref(false)
 
@@ -22,7 +26,39 @@ function hideElements(status: boolean) {
 }
 
 const store = useWeather()
-const savedWeather = store.list
+
+async function getWeatherData(lat: number, long: number) {
+  const name = await getLocationName(lat, long)
+  const currentLocation: storedLocations = {
+    longitude: long,
+    latitude: lat,
+    name: name,
+    current: true,
+  }
+  store.addList(currentLocation)
+}
+
+async function getLocationName(lat: number, long: number) {
+  const url = `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${long}&latitude=${lat}&limit=1&types=place&access_token=${import.meta.env.VITE_MAPBOX_API_KEY}`
+  const resp = await axios.get(url)
+  return resp.data.features[0].properties.name
+}
+
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        getWeatherData(pos.coords.latitude, pos.coords.longitude)
+      }
+    )
+  }
+}
+
+onMounted(() => {
+  getLocation()
+})
+
+
 </script>
 
 <style scoped>
