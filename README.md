@@ -9,6 +9,8 @@ The project is a simple weather app that fetches weather data from an API and di
 ## Project Setup
 
 Replace the `VITE_MAPBOX_API_KEY` and `VITE_WEATHEROPENAPI__KEY` in `.env` file with your own API keys.
+
+[App Link](https://weather-app-tawk-to-test.vercel.app/)
 [MapBox](http://docs.mapbox.com/help/getting-started/access-tokens/)
 [WeatherOpenAPI](https://openweathermap.org/api/one-call-3)
 
