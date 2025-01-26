@@ -34,56 +34,69 @@
       </div>
       <div class="form-item-container">
         <label for="phone">Phone Number</label>
-        <IntlTelInput id="iti" :options="{
-          initialCountry: 'us',
-          strictMode: true,
-          formatAsYouType: true,
-        }" :inputProps="{
-          placeholder: '+01 234 567 89',
-          class: 'full',
-        }" :value="profile.telNum" v-model="profile.telNum" :disabled="!isEdit" />
+        <IntlTelInput
+          id="iti"
+          :options="{
+            initialCountry: 'us',
+            strictMode: true,
+            formatAsYouType: true,
+          }"
+          :inputProps="{
+            placeholder: '123 - 456 - 7890',
+            class: 'full',
+          }"
+          :value="profile.telNum"
+          v-model="profile.telNum"
+          :disabled="!isEdit"
+        />
       </div>
     </form>
     <div class="error" v-if="displayError.length > 0">Error: {{ displayError }}</div>
     <div class="btn-container">
       <div class="inner">
         <BaseButton v-if="!isEdit" class="btn" @click="isEdit = !isEdit">edit</BaseButton>
-        <BaseButton v-if="isEdit" class="btn" :disabled="displayError.length > 0" @click.prevent="editProfile">
-          submit</BaseButton>
+        <BaseButton
+          v-if="isEdit"
+          class="btn"
+          :disabled="displayError.length > 0"
+          @click.prevent="editProfile"
+        >
+          submit</BaseButton
+        >
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch, computed } from 'vue'
-import BaseButton from '@/singleton/BaseButton.vue'
+import { onMounted, ref, watch, computed } from 'vue';
+import BaseButton from '@/singleton/BaseButton.vue';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import IntlTelInput from 'intl-tel-input/vueWithUtils'
-import 'intl-tel-input/styles'
-import { useProfileDetails } from '@/store'
+import IntlTelInput from 'intl-tel-input/vueWithUtils';
+import 'intl-tel-input/styles';
+import { useProfileDetails } from '@/store';
 
-const store = useProfileDetails()
+const store = useProfileDetails();
 const profile = ref({
   name: ' ',
   email: ' ',
   telNum: ' ',
-})
+});
 
 interface errLabel {
   name: {
-    valid: null | boolean
-    nameErrMsg: string
-  }
+    valid: null | boolean;
+    nameErrMsg: string;
+  };
   email: {
-    valid: null | boolean
-    nameErrMsg: string
-  }
+    valid: null | boolean;
+    nameErrMsg: string;
+  };
   telNum: {
-    valid: null | boolean
-    nameErrMsg: string
-  }
+    valid: null | boolean;
+    nameErrMsg: string;
+  };
 }
 
 const err = ref<errLabel>({
@@ -99,87 +112,86 @@ const err = ref<errLabel>({
     valid: true,
     nameErrMsg: '',
   },
-})
+});
 
 const displayError = computed(() => {
-  const errList: string[] = []
+  const errList: string[] = [];
   if (!err.value.name.valid) {
-    errList.push(err.value.name.nameErrMsg)
+    errList.push(err.value.name.nameErrMsg);
   }
   if (!err.value.email.valid) {
-    errList.push(err.value.email.nameErrMsg)
+    errList.push(err.value.email.nameErrMsg);
   }
   if (!err.value.telNum.valid) {
-    errList.push(err.value.telNum.nameErrMsg)
+    errList.push(err.value.telNum.nameErrMsg);
   }
-  return errList.join(', ')
-})
+  return errList.join(', ');
+});
 
-const isEdit = ref(false)
+const isEdit = ref(false);
 
 onMounted(() => {
-  const telNumberInputContainer = <HTMLElement>document.querySelector('.iti')
+  const telNumberInputContainer = <HTMLElement>document.querySelector('.iti');
   if (telNumberInputContainer != null) {
-    telNumberInputContainer.style.width = '100%'
+    telNumberInputContainer.style.width = '100%';
   }
-  profile.value.name = store.name
-  profile.value.email = store.email
-  profile.value.telNum = store.telNo
+  profile.value.name = store.name;
+  profile.value.email = store.email;
+  profile.value.telNum = store.telNo;
 
   document.addEventListener('keypress', function (e) {
     const submitButton = document.querySelector('.btn') as HTMLElement;
     if (e.key === 'Enter' && submitButton && displayError.value.length === 0 && isEdit.value) {
-
       submitButton.click();
     }
   });
-})
+});
 
 function editProfile() {
-  store.updateName(profile.value.name)
-  store.updateEmail(profile.value.email)
-  store.updateTelNo(profile.value.telNum)
-  isEdit.value = false
+  store.updateName(profile.value.name);
+  store.updateEmail(profile.value.email);
+  store.updateTelNo(profile.value.telNum);
+  isEdit.value = false;
 }
 
 watch(
   profile,
   async (newProfile) => {
-    let pattern = null
+    let pattern = null;
     if (newProfile.name !== '') {
-      pattern = /^[a-zA-Z][a-zA-Z0-9_ ]{4,18}[a-zA-Z0-9_]$/
+      pattern = /^[a-zA-Z][a-zA-Z0-9_ ]{4,18}[a-zA-Z0-9_]$/;
       if (pattern.test(newProfile.name)) {
-        err.value.name.valid = true
+        err.value.name.valid = true;
       } else {
-        err.value.name.nameErrMsg = 'Invalid Name'
-        err.value.name.valid = false
+        err.value.name.nameErrMsg = 'Invalid Name';
+        err.value.name.valid = false;
       }
     } else {
-      err.value.name.valid = false
-      err.value.name.nameErrMsg = 'Name cannot be empty'
+      err.value.name.valid = false;
+      err.value.name.nameErrMsg = 'Name cannot be empty';
     }
 
     if (newProfile.email !== '') {
-      pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+      pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       if (pattern.test(newProfile.email)) {
-        err.value.email.valid = true
+        err.value.email.valid = true;
       } else {
-        err.value.email.nameErrMsg = 'Invalid Email'
-        err.value.email.valid = false
+        err.value.email.nameErrMsg = 'Invalid Email';
+        err.value.email.valid = false;
       }
     } else {
-      err.value.email.valid = false
-      err.value.email.nameErrMsg = 'Email cannot be empty'
+      err.value.email.valid = false;
+      err.value.email.nameErrMsg = 'Email cannot be empty';
     }
     if (newProfile.telNum !== '') {
       if (newProfile.telNum.length < 10 || newProfile.telNum.length > 15) {
-        err.value.email.valid = false
-        err.value.email.nameErrMsg = 'Invalid Number'
+        err.value.email.valid = false;
+        err.value.email.nameErrMsg = 'Invalid Number';
       }
     }
   },
   { deep: true },
-)
+);
 </script>
 
 <style scoped>
@@ -296,8 +308,8 @@ input {
   background-color: #ffffff;
   border: 1px solid #ededed;
   box-shadow: 0 2px 25px 1px #00000005;
-  padding-left: .75rem;
-  padding-right: .75rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
   height: 50px;
   border-radius: 0.5rem;
   width: 100%;
@@ -308,7 +320,7 @@ input {
 
 #name,
 #email {
-  padding-top: .75rem;
+  padding-top: 0.75rem;
 }
 
 input[disabled] {

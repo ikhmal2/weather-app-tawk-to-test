@@ -1,14 +1,24 @@
 <template>
-  <button class="BaseButton" :disabled="props.disabled" :class="additionalClasses" :type="props.type"
-    :style="{ minWidth: props.minWidth }">
-    <component class="inner" :is="props.href ? 'a' : 'span'" :target="props.target" :href="props.href">
+  <button
+    class="BaseButton"
+    :disabled="props.disabled"
+    :class="additionalClasses"
+    :type="props.type"
+    :style="{ minWidth: props.minWidth }"
+  >
+    <component
+      class="inner"
+      :is="props.href ? 'a' : 'span'"
+      :target="props.target"
+      :href="props.href"
+    >
       <slot></slot>
     </component>
   </button>
 </template>
 
 <script setup lang="ts">
-import { computed, type PropType } from 'vue'
+import { computed, type PropType } from 'vue';
 
 const props = defineProps({
   disabled: {
@@ -38,13 +48,13 @@ const props = defineProps({
     type: String,
     default: '280px',
   },
-})
+});
 
 const additionalClasses = computed(() => {
-  const classes: string[] = []
-  if (props.hoverEffect) classes.push('withHoverEffect')
-  return classes
-})
+  const classes: string[] = [];
+  if (props.hoverEffect) classes.push('withHoverEffect');
+  return classes;
+});
 </script>
 
 <style scoped>
