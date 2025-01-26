@@ -18,7 +18,7 @@
         <div class="profile-details-inner">
           <p class="name">{{ store.name }}</p>
           <div class="contacts">
-            <p>{{ store.email }} | {{ store.telNo }}</p>
+            <p>{{ store.email }} | {{ store.telNo ? store.telNo : '+01 234 567 89' }}</p>
           </div>
         </div>
       </div>
@@ -34,35 +34,22 @@
       </div>
       <div class="form-item-container">
         <label for="phone">Phone Number</label>
-        <IntlTelInput
-          id="iti"
-          :options="{
-            initialCountry: 'us',
-            strictMode: true,
-            formatAsYouType: true,
-          }"
-          :inputProps="{
+        <IntlTelInput id="iti" :options="{
+          initialCountry: 'us',
+          strictMode: true,
+          formatAsYouType: true,
+        }" :inputProps="{
             placeholder: '123 - 456 - 7890',
             class: 'full',
-          }"
-          :value="profile.telNum"
-          v-model="profile.telNum"
-          :disabled="!isEdit"
-        />
+          }" :value="profile.telNum" v-model="profile.telNum" :disabled="!isEdit" />
       </div>
     </form>
     <div class="error" v-if="displayError.length > 0">Error: {{ displayError }}</div>
     <div class="btn-container">
       <div class="inner">
         <BaseButton v-if="!isEdit" class="btn" @click="isEdit = !isEdit">edit</BaseButton>
-        <BaseButton
-          v-if="isEdit"
-          class="btn"
-          :disabled="displayError.length > 0"
-          @click.prevent="editProfile"
-        >
-          submit</BaseButton
-        >
+        <BaseButton v-if="isEdit" class="btn" :disabled="displayError.length > 0" @click.prevent="editProfile">
+          submit</BaseButton>
       </div>
     </div>
   </div>
