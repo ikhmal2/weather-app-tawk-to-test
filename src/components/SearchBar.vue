@@ -1,20 +1,38 @@
 <template>
   <div id="search" :class="fullScreen ? 'full-screen' : ''" class="flex relative">
     <div class="relative search-container flex">
-      <input v-model="searchQuery" @input="getSearchResult" type="text" placeholder="Search for a city or airport" />
+      <input
+        v-model="searchQuery"
+        @input="getSearchResult"
+        type="text"
+        placeholder="Search for a city or airport"
+      />
       <img src="../assets/img/search.svg" alt="Search Icon" />
-      <img @click="clearResult" v-show="searchQuery !== ''" src="../assets/img/close.svg" alt="close" />
+      <img
+        @click="clearResult"
+        v-show="searchQuery !== ''"
+        src="../assets/img/close.svg"
+        alt="close"
+      />
     </div>
     <ul v-show="searchQuery !== ''" class="search-result">
+      <LoaderScreen style="top: 100%" v-if="isLoading" />
       <p v-if="searchError">Something went wrong, try again later</p>
-      <li v-for="(result, index) in mapboxSearchResult" :key="result.id" @click="
-        saveWeather(
-          result.properties.coordinates,
-          `${result.properties.name}, ${result.properties.context.country.name}`,
-        )
-        ">
-        <span>{{ result.properties.name }}</span>,
-        <span v-if="index !== 0">{{ result.properties.context.region.region_code }}<span>&nbsp;</span></span>
+      <li
+        v-for="(result, index) in mapboxSearchResult"
+        :key="result.id"
+        @click="
+          saveWeather(
+            result.properties.coordinates,
+            `${result.properties.name}, ${result.properties.context.country.name}`,
+          )
+        "
+      >
+        <span>{{ result.properties.name }}</span
+        >,
+        <span v-if="index !== 0"
+          >{{ result.properties.context.region.region_code }}<span>&nbsp;</span></span
+        >
         <span>{{ result.properties.context.country.name }}</span>
       </li>
     </ul>
@@ -22,44 +40,49 @@
 </template>
 
 <script setup lang="ts">
-import axios from 'axios'
-import { ref, watch } from 'vue'
-import router from '@/router'
-import { Feature } from '@/types'
+import axios from 'axios';
+import { ref, watch } from 'vue';
+import router from '@/router';
+import { Feature } from '@/types';
+import LoaderScreen from './LoaderScreen.vue';
 
-const emit = defineEmits(['hideElements'])
+const emit = defineEmits(['hideElements']);
 
-const fullScreen = ref(false)
-const searchQuery = ref('')
-const queryTimeout = ref(0)
-const mapboxSearchResult = ref<Feature[]>()
-const searchError = ref(false)
+const isLoading = ref(false);
+
+const fullScreen = ref(false);
+const searchQuery = ref('');
+const queryTimeout = ref(0);
+const mapboxSearchResult = ref<Feature[]>();
+const searchError = ref(false);
 const getSearchResult = () => {
-  clearTimeout(queryTimeout.value)
+  clearTimeout(queryTimeout.value);
   queryTimeout.value = setTimeout(async () => {
     if (searchQuery.value !== '') {
       try {
+        isLoading.value = true;
         const result = await axios.get(
           `https://api.mapbox.com/search/geocode/v6/forward?q=${searchQuery.value}&access_token=${import.meta.env.VITE_MAPBOX_API_KEY}&types=place`,
-        )
-        mapboxSearchResult.value = result.data.features
+        );
+        isLoading.value = false;
+        mapboxSearchResult.value = result.data.features;
       } catch {
-        searchError.value = true
+        searchError.value = true;
       }
-      return
+      return;
     }
-    mapboxSearchResult.value = []
-  }, 300)
-}
+    mapboxSearchResult.value = [];
+  }, 300);
+};
 
 function clearResult() {
-  mapboxSearchResult.value = []
-  searchQuery.value = ''
+  mapboxSearchResult.value = [];
+  searchQuery.value = '';
 }
 
 interface coords {
-  longitude: number
-  latitude: number
+  longitude: number;
+  latitude: number;
 }
 
 function saveWeather(coord: coords, name: string) {
@@ -70,18 +93,18 @@ function saveWeather(coord: coords, name: string) {
       lat: coord.latitude,
       name: name,
     },
-  })
+  });
 }
 
 watch(searchQuery, (newVal) => {
   if (newVal !== '') {
-    emit('hideElements', true)
-    fullScreen.value = true
+    emit('hideElements', true);
+    fullScreen.value = true;
   } else if (newVal === '') {
-    emit('hideElements', false)
-    fullScreen.value = false
+    emit('hideElements', false);
+    fullScreen.value = false;
   }
-})
+});
 </script>
 
 <style scoped>
@@ -118,11 +141,11 @@ li {
   padding-bottom: 0.5rem;
 }
 
-li>span:first-child {
+li > span:first-child {
   font-weight: bold;
 }
 
-li>span:not(:first-child) {
+li > span:not(:first-child) {
   color: #545454;
 }
 
@@ -140,7 +163,6 @@ input {
 img:first-of-type {
   position: absolute;
   left: 1rem;
-  /* transform: translate(0%, 40%); */
   width: 1.25rem;
   height: 1.25rem;
   object-fit: cover;
@@ -149,7 +171,6 @@ img:first-of-type {
 img:nth-of-type(2) {
   position: absolute;
   right: 1rem;
-  /* transform: translate(0%, 40%); */
   width: 1.125rem;
   height: 1.125rem;
   object-fit: cover;
